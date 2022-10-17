@@ -17,6 +17,10 @@ def connected():
 def new_node_added():
     emit("logs", {"data": "new_node"})
 
+@socketio.on("default_node")
+def default_node():
+    emit("logs", {"data": "default_node"})    
+
 if __name__ == '__main__':
     socketio.run(app, debug=True,port=5001)
 """
