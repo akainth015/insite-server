@@ -8,6 +8,8 @@ app.config['SECRET_KEY'] = 'secret!'
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+node_list = {}  # list of node to keep track
+
 
 @socketio.on("connect")
 def connected():
@@ -19,11 +21,6 @@ def connected():
 def new_node_added(node_data):
     print("data:" + str(node_data))
     emit("logs", {"data": node_data})
-
-
-@socketio.on("default_node")
-def default_node():
-    emit("logs", {"data": "default_node"})
 
 
 if __name__ == '__main__':
