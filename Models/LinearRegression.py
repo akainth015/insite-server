@@ -50,8 +50,6 @@ class LinearRegression:
             x: A matrix of features.
             y: A vector of labels.
         """
-        # ========== YOUR CODE STARTS HERE ==========
-
         for i in range(self.num_epochs):
             hypo_train = np.dot(x_train, self.theta)
             hypo_val = np.dot(x_val, self.theta)
