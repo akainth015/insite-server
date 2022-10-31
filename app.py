@@ -8,7 +8,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 @socketio.on("linear")
 def handle_linear_regression(json):
-    print("Received a json " + str(type(json)))
+    print("Received a json " + str(type(json[0])))
     emit("linear", json, broadcast=False)
 
 
