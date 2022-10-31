@@ -31,7 +31,17 @@ def handle_linear_regression(json):
     trainer = LinearRegressionTrainer(dataset.columns.size - 1,
                                       learning_rate=0.5,
                                       num_epochs=10000)
-    emit("linear", json, broadcast=False)
+
+    #Store train and val losses in result
+    trainer.train(x_train, y_train, x_val, y_val)
+    val_loss = trainer.evaluate(x_val, y_val)
+    train_loss = trainer.evaluate(x_train, y_train)
+
+    result = {}
+    result["val_loss"] = val_loss
+    result["train_loss"] = train_loss
+
+    emit("linear", result, broadcast=False)
 
 
 if __name__ == '__main__':
