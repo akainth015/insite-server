@@ -2,10 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from tqdm.notebook import trange
 
 
-class LinearRegression:
+class LinearRegressionTrainer:
 
     def __init__(self,
                  num_features: int,
@@ -17,8 +16,33 @@ class LinearRegression:
         self.num_features = num_features
         self.train_loss_history = []
         self.val_loss_history = []
-        self.test_loss = None
         self.theta = np.zeros(self.num_features + 1)
+        self.train_lables = []
+
+    def set_labels(self, y: np.ndarray) -> None:
+        """
+        Set the labels of the dataset.
+
+        Args:
+            y: A vector of labels.
+        """
+        self.train_labels = y
+
+    def process_data(self, x: np.ndarray, x_labels: np.ndarray) -> np.ndarray:
+        """
+        Given a matrix of features and the labels, rearrange the matrix so that the labels match self.train_labels
+        Arge:
+            x: matrix of features
+            x_labels: column names of the features
+        Returns:
+            A matrix of features in the same order as self.train_labels
+        """
+        
+        x = pd.DataFrame(x, columns=x_labels)
+        x = x[self.train_labels]
+        return x.to_numpy()
+        
+        
 
     def gradient_descent_step(self, x: np.ndarray, y: np.ndarray) -> None:
         """
@@ -50,8 +74,6 @@ class LinearRegression:
             x: A matrix of features.
             y: A vector of labels.
         """
-        # ========== YOUR CODE STARTS HERE ==========
-
         for i in range(self.num_epochs):
             hypo_train = np.dot(x_train, self.theta)
             hypo_val = np.dot(x_val, self.theta)
@@ -80,17 +102,17 @@ class LinearRegression:
 
         return J
 
-    def evaluate(self, x_test: np.ndarray, y_test: np.ndarray) -> None:
+    def evaluate(self, x_test: np.ndarray, y_test: np.ndarray) -> int:
         """
-        Evaluate the model on test set and store the test loss int self.test_loss.
+        Evaluate the model on test set and return the test loss
 
         Args:
             x_test: A matrix of features.
             y_test: A vector of labels.
         """
         hypo_test = np.dot(x_test, self.theta)
-        self.test_loss = LinearRegressionTrainer.mse_loss(hypo_test, y_test)
-
+        return LinearRegressionTrainer.mse_loss(hypo_test, y_test)
+        
     def mse_loss(pred: np.ndarray, target: np.ndarray) -> float:
         """
         Calculate the mean squared error given prediction and target. 
