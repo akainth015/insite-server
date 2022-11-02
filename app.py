@@ -33,13 +33,22 @@ def handle_linear_regression(nodeId, features, labels, feature_names, label_name
 
     #Train
     trainer.train(x_train, y_train, x_val, y_val)
+
+    #Calculate Loss
     val_loss = trainer.evaluate(x_val, y_val)
     train_loss = trainer.evaluate(x_train, y_train)
 
+    #Calculate Accuracy
+    val_accuracy = trainer.accuracy(x_val, y_val)
+    train_accuracy = trainer.accuracy(x_train, y_train)
+
     #Store train and val losses in result dictionary
     result = {
+        "nodeId": nodeId,
         "train_loss": train_loss,
-        "val_loss": val_loss
+        "val_loss": val_loss,
+        "train_accuracy": train_accuracy,
+        "val_accuracy": val_accuracy,
     }
 
     #Store the model in the global models dictionary
