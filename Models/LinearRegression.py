@@ -37,10 +37,12 @@ class LinearRegressionTrainer:
         Returns:
             A matrix of features in the same order as self.train_labels
         """
-
+        
         x = pd.DataFrame(x, columns=x_labels)
         x = x[self.train_labels]
         return x.to_numpy()
+        
+        
 
     def gradient_descent_step(self, x: np.ndarray, y: np.ndarray) -> None:
         """
@@ -110,28 +112,7 @@ class LinearRegressionTrainer:
         """
         hypo_test = np.dot(x_test, self.theta)
         return LinearRegressionTrainer.mse_loss(hypo_test, y_test)
-
-    def accuracy(self, x_test: np.ndarray, y_test: np.ndarray) -> int:
-        """
-        Evaluate the model on test set and return the test accuracy
-
-        Args:
-            x_test: A matrix of features.
-            y_test: A vector of labels.
-        """
-        hypo_test = np.dot(x_test, self.theta)
-        for i in range(len(hypo_test)):
-            if hypo_test[i] >= 0.5:
-                hypo_test[i] = 1
-            else:
-                hypo_test[i] = 0
         
-        sum = 0
-        for i in range(len(hypo_test)):
-            if hypo_test[i] == y_test[i]:
-                sum += 1
-        return sum / len(hypo_test)
-
     def mse_loss(pred: np.ndarray, target: np.ndarray) -> float:
         """
         Calculate the mean squared error given prediction and target. 
