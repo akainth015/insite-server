@@ -1,5 +1,9 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from Models.LinearRegression import LinearRegressionTrainer
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -7,39 +11,33 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 
 @socketio.on("linear")
-def handle_linear_regression(json):
-    print("Received a json " + str(type(json)))
+def handle_linear_regression(features, labels, feature_names, label_name):
+    # Convert the features and feature names to dataframe
+    features_df = pd.DataFrame(features, columns=feature_names)
 
-    #Drop the category called "y" and store it in a matrix called y
-    y = json["y"]
-    df_y = pd.read_json(y, orient='split')
-
-    #Store the other categories in a matrix called x
-    x = json.drop(columns=["y"])
-    df_x = pd.read_json(x, orient='split')
+    # Convert the labels to numpy array
+    labels = np.array(labels)
 
     #Split the data into training and validation data
-    x_train, x_val, y_train, y_val = train_test_split(df_x,
-                                                      df_y,
-                                                      test_size=0.2,
-                                                      random_state=42)
-
-    print(x_train)
-    print(y_train)
+    x_train, x_val, y_train, y_val = train_test_split(features_df, labels, test_size=0.2)
 
     #Create a LinearRegressionTrainer object
-    trainer = LinearRegressionTrainer(dataset.columns.size - 1,
-                                      learning_rate=0.5,
-                                      num_epochs=10000)
+    trainer = LinearRegressionTrainer(len(features_df.columns) - 1,
+                                        learning_rate=0.5,
+                                        num_epochs=10000)
 
-    #Store train and val losses in result
+
+
+    #Train
     trainer.train(x_train, y_train, x_val, y_val)
     val_loss = trainer.evaluate(x_val, y_val)
     train_loss = trainer.evaluate(x_train, y_train)
 
-    result = {}
-    result["val_loss"] = val_loss
-    result["train_loss"] = train_loss
+    #Store train and val losses in result dictionary
+    result = {
+        "train_loss": train_loss,
+        "val_loss": val_loss
+    }
 
     emit("linear", result, broadcast=False)
 
