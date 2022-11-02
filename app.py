@@ -9,9 +9,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Global array of models
+models = {}
+
 
 @socketio.on("linear")
-def handle_linear_regression(features, labels, feature_names, label_name):
+def handle_linear_regression(nodeId, features, labels, feature_names, label_name):
     # Convert the features and feature names to dataframe
     features_df = pd.DataFrame(features, columns=feature_names)
 
@@ -38,6 +41,9 @@ def handle_linear_regression(features, labels, feature_names, label_name):
         "train_loss": train_loss,
         "val_loss": val_loss
     }
+
+    #Store the model in the global models dictionary
+    models[nodeId] = trainer
 
     emit("linear", result, broadcast=False)
 
