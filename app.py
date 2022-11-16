@@ -1,10 +1,8 @@
-from flask import Flask
-from flask_socketio import SocketIO, send, emit
+from flask import Flask, request
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
-# socketio = SocketIO(app)
-app.config['SECRET_KEY'] = 'secret!'
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -15,25 +13,12 @@ def connected():
     emit("logs", {"data": "Connected"})
 
 
-@socketio.on("new_node")
-def new_node_added(node_data):
-    print("data:" + str(node_data))
-    emit("logs", {"data": node_data})
-
-
-@socketio.on("default_node")
-def default_node():
-    emit("logs", {"data": "default_node"})
+@app.route("/hooks/<node_id>")
+def activate_web_hook(node_id):
+    print("The web-hook for " + node_id + " was activated")
+    socketio.emit("web-hook", (node_id, request.get_json(silent=True)))
+    return "Success"
 
 
 if __name__ == '__main__':
-    # socketio.run(app, debug=True, port=3000)
-    socketio.run(app)
-"""
-@app.route("/")
-def hello():
-  return "Hello World!"
-
-if __name__ == "__main__":
-  app.run()
-"""
+    socketio.run(app, debug=True, port=5000)
