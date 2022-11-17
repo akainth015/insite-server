@@ -1,17 +1,37 @@
 from flask import Flask, render_template
-from flask_socketio import SocketIO, emit
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, accuracy_score
 
+from flask_socketio import SocketIO, send, emit
+from flask_cors import CORS
+
 app = Flask(__name__)
+# socketio = SocketIO(app)
 app.config['SECRET_KEY'] = 'secret!'
+CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Global array of models
-models = {}
+
+@socketio.on("connect")
+def connected():
+    print("client connected")
+    emit("logs", {"data": "Connected"})
+
+
+@socketio.on("new_node")
+def new_node_added(node_data):
+    print("data:" + str(node_data))
+    emit("logs", {"data": node_data})
+
+
+@socketio.on("default_node")
+def default_node():
+    emit("logs", {"data": "default_node"})
+
+
 
 
 @socketio.on("linear")
@@ -55,6 +75,7 @@ def handle_linear_regression(nodeId, features, labels, feature_names, label_name
 
     emit("linear", (nodeId, result), broadcast=False)
 
-
 if __name__ == '__main__':
+    # socketio.run(app, debug=True, port=3000)
     socketio.run(app)
+
