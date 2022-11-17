@@ -53,8 +53,8 @@ def handle_linear_regression(nodeId, features, labels, feature_names, label_name
     y_val_pred = model.predict(x_val)
 
     # Get the training and validation accuracy
-    train_accuracy = accuracy_score(y_train, y_train_pred)
-    val_accuracy = accuracy_score(y_val, y_val_pred)
+    train_accuracy = model.score(x_train, y_train)
+    val_accuracy = model.score(x_val, y_val)
     
 
     # Get the training and validation loss
@@ -70,8 +70,6 @@ def handle_linear_regression(nodeId, features, labels, feature_names, label_name
         "val_accuracy": val_accuracy
     }
 
-    #Store the model in the global models dictionary
-    models[nodeId] = trainer
 
     emit("linear", (nodeId, result), broadcast=False)
 
