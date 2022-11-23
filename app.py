@@ -6,6 +6,14 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from dotenv import load_dotenv
 
+from flask import Flask, request,jsonify
+from flask_socketio import SocketIO, send, emit
+from flask_cors import CORS
+from yfinance import Ticker as TC
+from yfinance import download as download
+import pandas as pd
+import yfinance as yf
+
 load_dotenv()
 
 app = Flask(__name__)
