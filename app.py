@@ -122,6 +122,17 @@ def language(input_string):
             print("\nException: " + str(e))
             return ("\nException: " + str(e))
 
+@socketio.on("get_market_price")
+def get_market_price(node_id, company_name):
+  compInfo = TC(company_name)
+  error = "Improper Ticker Symbol"
+  print(compInfo)
+  for key, value in compInfo.info.items():
+    if key == "regularMarketPrice":
+      if(value != None):
+        socketio.emit("get_market_price", (node_id, value))
+      else:
+        socketio.emit("get_market_price", (node_id, error))
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, port=5000)
