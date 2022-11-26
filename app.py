@@ -142,5 +142,20 @@ def get_market_price(node_id, company_name):
       else:
         socketio.emit("get_market_price", (node_id, error))
 
+@socketio.on("get_last_week_data")
+def get_chart_price():
+  tickerStrings = ['MSFT']
+  df_list = list()
+  for ticker in tickerStrings:
+    data = yf.download(ticker, group_by="Ticker", period='max')
+    data['ticker'] = ticker  # add this column because the dataframe doesn't contain a column with the ticker
+    df_list.append(data)
+
+# combine all dataframes into a single dataframe
+  df = pd.concat(df_list)
+# save to csv
+  df.to_csv('ticker.csv')
+  return f'<h> hello </h>'
+
 if __name__ == '__main__':
     socketio.run(app, debug=False, port=5000)
