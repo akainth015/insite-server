@@ -6,13 +6,14 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from dotenv import load_dotenv
 
-from flask import Flask, request,jsonify
+from flask import Flask, request,jsonify, render_template
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 from yfinance import Ticker as TC
 from yfinance import download as download
 import pandas as pd
 import yfinance as yf
+import csv
 
 load_dotenv()
 
@@ -134,7 +135,6 @@ def language(input_string):
 def get_market_price(node_id, company_name):
   compInfo = TC(company_name)
   error = "Improper Ticker Symbol"
-  print(compInfo)
   for key, value in compInfo.info.items():
     if key == "regularMarketPrice":
       if(value != None):
@@ -142,20 +142,25 @@ def get_market_price(node_id, company_name):
       else:
         socketio.emit("get_market_price", (node_id, error))
 
-@socketio.on("get_last_week_data")
-def get_chart_price():
-  tickerStrings = ['MSFT']
-  df_list = list()
-  for ticker in tickerStrings:
-    data = yf.download(ticker, group_by="Ticker", period='max')
-    data['ticker'] = ticker  # add this column because the dataframe doesn't contain a column with the ticker
+@socketio.on("get_historical_prices")
+def get_chart_price(node_id, company_name):
+    df_list = list()
+    data = yf.download(company_name, group_by="Ticker", period='1mo')
+    data['ticker'] = company_name  # add this column because the dataframe doesn't contain a column with the ticker
     df_list.append(data)
+    df = pd.concat(df_list)
+    df.to_csv('ticker.csv')
+    final_result = []
 
-# combine all dataframes into a single dataframe
-  df = pd.concat(df_list)
-# save to csv
-  df.to_csv('ticker.csv')
-  return f'<h> hello </h>'
+    with open("ticker.csv") as csvFile:
+        reader = csv.DictReader(csvFile)
+        for row in reader:
+            final_result.append(row)
+            
+    socketio.emit("get_historical_prices", (node_id, final_result))
+
+
+     
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, port=5000)
