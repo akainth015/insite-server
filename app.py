@@ -133,14 +133,15 @@ def language(input_string):
 
 @socketio.on("get_market_price")
 def get_market_price(node_id, company_name):
+    print(company_name)
     compInfo = TC(company_name)
     error = "Improper Ticker Symbol"
     for key, value in compInfo.info.items():
         if key == "regularMarketPrice":
             if(value != None):
-                socketio.emit("get_market_price", (node_id, value))
-        else:
-            socketio.emit("get_market_price", (node_id, error))
+                return value
+            else:
+                return error
 
 @socketio.on("get_historical_prices")
 def get_chart_price(node_id, company_name):
@@ -157,7 +158,7 @@ def get_chart_price(node_id, company_name):
         for row in reader:
             final_result.append(row)
             
-    socketio.emit("get_historical_prices", (node_id, final_result))
+    return final_result
 
 
      
