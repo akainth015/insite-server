@@ -157,7 +157,7 @@ def get_chart_price(node_id, company_name):
         reader = csv.DictReader(csvFile)
         for row in reader:
             final_result.append(row)
-            
+
     return final_result
 
 
