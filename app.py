@@ -6,7 +6,7 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from dotenv import load_dotenv
 
-from flask import Flask, request,jsonify, render_template
+from flask import Flask, request
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 from yfinance import Ticker as TC
