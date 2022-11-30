@@ -139,9 +139,9 @@ def get_market_price(node_id, company_name):
     for key, value in compInfo.info.items():
         if key == "regularMarketPrice":
             if(value != None):
-                return value
+                socketio.emit("get_market_price", (node_id, value))
             else:
-                return error
+                socketio.emit("get_market_price", (node_id, error))
 
 @socketio.on("get_historical_prices")
 def get_chart_price(node_id, company_name):
@@ -158,10 +158,11 @@ def get_chart_price(node_id, company_name):
         for row in reader:
             final_result.append(row)
 
-    return final_result
+    socketio.emit("get_historical_prices", (node_id, final_result))
+
 
 
      
 
 if __name__ == '__main__':
-    socketio.run(app, debug=False, port=5000)
+    socketio.run(app, debug=False, port=5001)
